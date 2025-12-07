@@ -140,11 +140,80 @@ body {
   font-weight: 500;
   font-size: 0.9rem;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dark-mode-toggle:hover {
   opacity: 0.8;
   transform: translateY(-1px);
+}
+
+/* Mobile menu button */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--foreground);
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.mobile-menu-button:hover {
+  color: var(--accent-orange);
+}
+
+/* Mobile menu */
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--background);
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+}
+
+.mobile-menu.open {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--foreground);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-menu a:hover {
+  background: var(--accent-peach);
+  color: var(--accent-orange);
+}
+
+.mobile-menu .dark-mode-toggle {
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
 /* ============================================
@@ -304,6 +373,7 @@ body {
 }
 
 .footer-social a:hover {
+  background: var(--accent-orange);
   transform: translateY(-2px);
 }
 
@@ -335,15 +405,21 @@ body {
    MOBILE RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
+  .header {
+    position: relative;
+  }
+
   .header-content {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row;
+    justify-content: space-between;
   }
 
   .nav-links {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: block;
   }
 
   .main-content {
