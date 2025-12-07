@@ -32,6 +32,12 @@ const Pdf = dynamic(
     { ssr: false }
 )
 
+const Code = dynamic(
+    () => import('react-notion-x/build/third-party/code').then((m) => m.Code),
+    { ssr: false }
+)
+
+
 interface NotionPageProps {
     recordMap: ExtendedRecordMap
     slugMap?: Record<string, string>
@@ -52,6 +58,7 @@ export function NotionPage({ recordMap, slugMap = {} }: NotionPageProps) {
                 components={{
                     Collection,
                     Equation,
+                    Code,
                     Modal,
                     Pdf,
                 }}

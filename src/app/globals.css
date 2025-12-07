@@ -373,7 +373,6 @@ body {
 }
 
 .footer-social a:hover {
-  background: var(--accent-orange);
   transform: translateY(-2px);
 }
 

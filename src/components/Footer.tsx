@@ -9,7 +9,7 @@ export default function Footer() {
                 <div className="footer-top">
                     <div className="footer-brand">
                         <h3>Building Tomorrow's Digital Infrastructure</h3>
-                        <p>Connecting communities through innovative solutions.</p>
+                        <p>We're not building this overnight. But every tool we launch, every problem we solve, and every Kenyan we help is a step toward a more connected, more capable digital economy.</p>
                     </div>
                     <div className="footer-sections">
                         <div className="footer-section">
