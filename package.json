@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build-cache && next build",
+    "build-cache": "tsx ./src/scripts/build-slug-cache.ts",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"
@@ -31,6 +32,7 @@
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

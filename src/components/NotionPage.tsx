@@ -1,5 +1,5 @@
 // ============================================
-// src/components/NotionPage.tsx (CLIENT COMPONENT)
+// src/components/NotionPage.tsx (UPDATED)
 // ============================================
 'use client'
 
@@ -7,7 +7,11 @@ import dynamic from 'next/dynamic'
 import { ExtendedRecordMap } from 'notion-types'
 import { NotionRenderer } from 'react-notion-x'
 
-// Lazy load heavy components
+import 'react-notion-x/src/styles.css'
+import 'prismjs/themes/prism-tomorrow.css'
+import 'katex/dist/katex.min.css'
+import '@/styles/notion.css'
+
 const Collection = dynamic(() =>
     import('react-notion-x/build/third-party/collection').then(
         (m) => m.Collection
@@ -30,24 +34,37 @@ const Pdf = dynamic(
 
 interface NotionPageProps {
     recordMap: ExtendedRecordMap
+    slugMap?: Record<string, string>
 }
 
-export function NotionPage({ recordMap }: NotionPageProps) {
+export function NotionPage({ recordMap, slugMap = {} }: NotionPageProps) {
     if (!recordMap) {
         return null
     }
 
     return (
-        <NotionRenderer
-            recordMap={recordMap}
-            fullPage={true}
-            darkMode={false}
-            components={{
-                Collection,
-                Equation,
-                Modal,
-                Pdf,
-            }}
-        />
+        <div className="notion-wrapper">
+            <NotionRenderer
+                rootDomain='https://blog.spiritbulb.org'
+                recordMap={recordMap}
+                fullPage={true}
+                darkMode={false}
+                components={{
+                    Collection,
+                    Equation,
+                    Modal,
+                    Pdf,
+                }}
+                disableHeader={true}
+                // Map page IDs to slugs
+                mapPageUrl={(pageId) => {
+                    const cleanId = pageId.replace(/-/g, '')
+                    // Return slug if we have it, otherwise return ID
+                    const slug = slugMap[cleanId]
+                    console.log(`Mapping ${pageId} (${cleanId}) → ${slug || `/${cleanId}`}`)
+                    return slug
+                }}
+            />
+        </div>
     )
 }
