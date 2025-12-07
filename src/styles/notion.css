@@ -10,17 +10,62 @@
     --notion-max-width: 1200px;
     --notion-header-height: 45vh;
 
-    /* Colors - Super's palette */
+    /* Colors - Super's palette (Light Mode) */
     --bg-color: #f7f6f3;
     --text-primary: #37352f;
     --text-secondary: #787774;
     --accent-orange: #d9730d;
     --accent-peach: #fadec9;
     --border-color: #e3e2df;
+    --card-bg: #ffffff;
+    --callout-border: #f3d8ba;
+    --icon-bg: #ffffff;
 
     /* Typography */
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial, sans-serif;
     --font-serif: Lyon-Text, Georgia, ui-serif, serif;
+}
+
+/* ============================================
+   DARK MODE - Auto (system preference)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #191919;
+        --text-primary: #e6e6e6;
+        --text-secondary: #9b9a97;
+        --accent-peach: #3a2d1f;
+        --border-color: #2f2f2f;
+        --card-bg: #252525;
+        --callout-border: #4a3a2a;
+        --icon-bg: #2a2a2a;
+    }
+}
+
+/* ============================================
+   DARK MODE - Manual Override
+   ============================================ */
+:root[data-theme="dark"] {
+    --bg-color: #191919;
+    --text-primary: #e6e6e6;
+    --text-secondary: #9b9a97;
+    --accent-peach: #3a2d1f;
+    --border-color: #2f2f2f;
+    --card-bg: #252525;
+    --callout-border: #4a3a2a;
+    --icon-bg: #2a2a2a;
+}
+
+:root[data-theme="light"] {
+    --bg-color: #f7f6f3;
+    --text-primary: #37352f;
+    --text-secondary: #787774;
+    --accent-orange: #d9730d;
+    --accent-peach: #fadec9;
+    --border-color: #e3e2df;
+    --card-bg: #ffffff;
+    --callout-border: #f3d8ba;
+    --icon-bg: #ffffff;
 }
 
 /* ============================================
@@ -30,6 +75,7 @@
     font-family: var(--font-sans);
     background: var(--bg-color);
     color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Remove default Notion padding */
@@ -53,6 +99,7 @@
     margin-left: auto;
     margin-right: auto;
     color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 /* ============================================
@@ -60,24 +107,27 @@
    ============================================ */
 .notion-callout {
     background: var(--accent-peach) !important;
-    border: 1px solid #f3d8ba !important;
+    border: 1px solid var(--callout-border) !important;
     border-radius: 8px !important;
     padding: 1.5rem !important;
     margin: auto !important;
     max-width: var(--notion-max-width);
     margin-left: auto !important;
     margin-right: auto !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .notion-callout-text {
     color: var(--text-primary) !important;
     font-size: 0.95rem !important;
+    transition: color 0.3s ease;
 }
 
 .notion-page-icon-wrapper {
-    background: white !important;
+    background: var(--icon-bg) !important;
     border-radius: 6px;
     padding: 0.5rem;
+    transition: background-color 0.3s ease;
 }
 
 /* ============================================
@@ -97,6 +147,7 @@
     line-height: 1.7;
     color: var(--text-primary);
     font-size: 1rem;
+    transition: color 0.3s ease;
 }
 
 .notion-h1,
@@ -107,6 +158,7 @@
     color: var(--text-primary);
     margin-top: 2rem;
     margin-bottom: 1rem;
+    transition: color 0.3s ease;
 }
 
 .notion-h1 {
@@ -135,11 +187,11 @@
 }
 
 .notion-collection-card {
-    background: white !important;
+    background: var(--card-bg) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 8px !important;
     overflow: hidden;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -149,10 +201,22 @@
     border-color: #d3d1cb;
 }
 
+/* Dark mode hover adjustment */
+:root[data-theme="dark"] .notion-collection-card:hover {
+    border-color: #4a4a4a;
+}
+
+@media (prefers-color-scheme: dark) {
+    .notion-collection-card:hover {
+        border-color: #4a4a4a;
+    }
+}
+
 .notion-collection-card-cover {
     height: 200px;
     object-fit: cover;
     border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 .notion-collection-card-body {
@@ -165,11 +229,13 @@
     font-weight: 600 !important;
     margin-bottom: 0.5rem !important;
     color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .notion-property-text {
     color: var(--text-secondary);
     font-size: 0.9rem;
+    transition: color 0.3s ease;
 }
 
 /* ============================================
@@ -184,6 +250,7 @@
     border-radius: 4px !important;
     font-size: 0.85rem !important;
     font-weight: 500 !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ============================================
@@ -206,6 +273,32 @@
 .notion-image {
     border-radius: 8px;
     overflow: hidden;
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.notion-code {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ============================================
+   QUOTES
+   ============================================ */
+.notion-quote {
+    border-left: 3px solid var(--accent-orange);
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+/* ============================================
+   DIVIDER
+   ============================================ */
+.notion-hr {
+    border-color: var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 /* ============================================
@@ -233,23 +326,5 @@
 
     .notion-page-content {
         padding: 0 1rem 2rem;
-    }
-
-}
-
-/* ============================================
-   DARK MODE (Optional)
-   ============================================ */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #191919;
-        --text-primary: #e6e6e6;
-        --text-secondary: #9b9a97;
-        --accent-peach: #3a2d1f;
-        --border-color: #2f2f2f;
-    }
-
-    .notion-collection-card {
-        background: #252525 !important;
     }
 }
