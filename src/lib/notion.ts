@@ -1,5 +1,5 @@
 // ============================================
-// src/lib/notion.ts (UPDATED)
+// src/lib/notion.ts (FIXED - DETECTS CHILD PAGES)
 // ============================================
 import { NotionAPI } from 'notion-client'
 import { ExtendedRecordMap, Block } from 'notion-types'
@@ -51,7 +51,24 @@ function isCacheValid(): boolean {
     return (now - cacheEntry.timestamp) < CACHE_TTL
 }
 
-// Build slug map with caching
+// Check if a block contains child pages by looking at its content
+function getChildPageIds(block: Block, blocks: Record<string, any>): string[] {
+    const childPageIds: string[] = []
+
+    // Check if block has content property (array of block IDs)
+    if (block.content && Array.isArray(block.content)) {
+        for (const childId of block.content) {
+            const childBlock = blocks[childId]?.value
+            if (childBlock && childBlock.type === 'page') {
+                childPageIds.push(childId)
+            }
+        }
+    }
+
+    return childPageIds
+}
+
+// Build slug map with proper parent-child detection
 export async function buildSlugMap(databaseId: string): Promise<Map<string, PageMetadata>> {
     // Return cached data if still valid
     if (isCacheValid() && cacheEntry) {
@@ -64,65 +81,111 @@ export async function buildSlugMap(databaseId: string): Promise<Map<string, Page
     try {
         const recordMap = await notion.getPage(databaseId)
         const blocks = recordMap.block || {}
-        const pageIds: string[] = []
         const slugCount = new Map<string, number>()
-        const slugCache = new Map<string, PageMetadata>()
+        const metadataById = new Map<string, PageMetadata>()
+        const childrenByParent = new Map<string, string[]>()
 
+        // First pass: identify all pages and their direct parent-child relationships
         for (const [blockId, blockData] of Object.entries(blocks)) {
             const block = blockData?.value
-            if (!block) continue
-            if (block.type === 'page' && block.id !== databaseId) {
-                pageIds.push(block.id)
+            if (!block || block.type !== 'page') continue
+            if (block.id === databaseId) continue
+
+            const cleanId = block.id.replace(/-/g, '')
+            const title = block.properties?.title?.[0]?.[0] || 'Untitled'
+            let slug = createSlug(title)
+
+            // Handle duplicate slugs
+            const baseSlug = slug
+            const count = slugCount.get(baseSlug) || 0
+            slugCount.set(baseSlug, count + 1)
+            if (count > 0) {
+                slug = `${baseSlug}-${count}`
             }
+
+            // Find actual parent by checking which page contains this page in its content
+            let actualParentId: string | undefined = undefined
+
+            // Check all other pages to see if they contain this page as a child
+            for (const [potentialParentId, potentialParentData] of Object.entries(blocks)) {
+                const parentBlock = potentialParentData?.value
+                if (!parentBlock || parentBlock.type !== 'page') continue
+
+                const childIds = getChildPageIds(parentBlock, blocks)
+                if (childIds.includes(block.id)) {
+                    actualParentId = potentialParentId
+
+                    // Store the relationship
+                    if (!childrenByParent.has(potentialParentId)) {
+                        childrenByParent.set(potentialParentId, [])
+                    }
+                    childrenByParent.get(potentialParentId)!.push(cleanId)
+                    break
+                }
+            }
+
+            metadataById.set(cleanId, {
+                id: cleanId,
+                title,
+                slug,
+                parentId: actualParentId,
+                fullPath: '', // Will be computed in second pass
+            })
+
+            console.log(`Page: ${title} (${cleanId}) - Parent: ${actualParentId || 'none'}`)
         }
 
-        console.log(`Found ${pageIds.length} pages to process`)
-
-        for (const pageId of pageIds) {
-            try {
-                const block = blocks[pageId]?.value
-                if (!block) continue
-
-                const title = block.properties?.title?.[0]?.[0] || 'Untitled'
-                let slug = createSlug(title)
-
-                const baseSlug = slug
-                const count = slugCount.get(baseSlug) || 0
-                slugCount.set(baseSlug, count + 1)
-
-                if (count > 0) {
-                    slug = `${baseSlug}-${count}`
-                }
-
-                const parentId = block.parent_id
-                let parentSlug: string | undefined
-                let fullPath = `/${slug}`
-
-                if (parentId && parentId !== databaseId) {
-                    const parentBlock = blocks[parentId]?.value
-                    if (parentBlock && parentBlock.type === 'page') {
-                        const parentTitle = parentBlock.properties?.title?.[0]?.[0] || 'Untitled'
-                        parentSlug = createSlug(parentTitle)
-                        fullPath = `/${parentSlug}/${slug}`
-                    }
-                }
-
-                const cleanId = pageId.replace(/-/g, '')
-                const metadata: PageMetadata = {
-                    id: cleanId,
-                    title,
-                    slug,
-                    parentId,
-                    parentSlug,
-                    fullPath
-                }
-
-                slugCache.set(fullPath, metadata)
-                slugCache.set(cleanId, metadata)
-
-            } catch (err) {
-                console.error(`Error processing page ${pageId}:`, err)
+        // Second pass: build full hierarchical paths
+        function buildFullPath(pageId: string, visited = new Set<string>()): string {
+            if (visited.has(pageId)) {
+                console.warn(`Circular reference detected for page ${pageId}`)
+                return ''
             }
+            visited.add(pageId)
+
+            const metadata = metadataById.get(pageId)
+            if (!metadata) return ''
+
+            // If already computed, return it
+            if (metadata.fullPath) return metadata.fullPath
+
+            const parentId = metadata.parentId?.replace(/-/g, '')
+
+            // If no parent or parent is the database, this is a top-level page
+            if (!parentId || parentId === databaseId || !metadataById.has(parentId)) {
+                metadata.fullPath = `/${metadata.slug}`
+                return metadata.fullPath
+            }
+
+            // Recursively build parent's path first
+            const parentPath = buildFullPath(parentId, visited)
+
+            if (parentPath) {
+                const parentMetadata = metadataById.get(parentId)
+                metadata.parentSlug = parentMetadata?.slug
+                metadata.fullPath = `${parentPath}/${metadata.slug}`
+            } else {
+                // Fallback if parent path couldn't be built
+                metadata.fullPath = `/${metadata.slug}`
+            }
+
+            return metadata.fullPath
+        }
+
+        // Build paths for all pages
+        for (const [pageId] of metadataById) {
+            buildFullPath(pageId)
+        }
+
+        // Third pass: populate the cache
+        const slugCache = new Map<string, PageMetadata>()
+        for (const [pageId, metadata] of metadataById) {
+            // Add by full path
+            slugCache.set(metadata.fullPath, metadata)
+            // Add by ID
+            slugCache.set(metadata.id, metadata)
+
+            console.log(`✓ Mapped: ${metadata.title} → ${metadata.fullPath}`)
         }
 
         // Update cache
@@ -131,7 +194,7 @@ export async function buildSlugMap(databaseId: string): Promise<Map<string, Page
             timestamp: Date.now()
         }
 
-        console.log(`✓ Slug map rebuilt: ${slugCache.size} entries`)
+        console.log(`✓ Slug map rebuilt: ${slugCache.size} entries, ${childrenByParent.size} parent-child relationships`)
         return slugCache
 
     } catch (error) {
@@ -141,7 +204,6 @@ export async function buildSlugMap(databaseId: string): Promise<Map<string, Page
     }
 }
 
-// Rest of your functions remain the same, but they now use the cached buildSlugMap
 export async function getPageIdFromSlug(slugPath: string): Promise<string | null> {
     const normalizedPath = slugPath.startsWith('/') ? slugPath : `/${slugPath}`
     const slugCache = await buildSlugMap(HOMEPAGE_ID)
@@ -178,6 +240,7 @@ export async function getSlugMapForClient(): Promise<Record<string, string>> {
     const slugsById: Record<string, string> = {}
 
     for (const [key, metadata] of slugCache.entries()) {
+        // Only add entries where the key is an ID (32 hex chars)
         if (key.length === 32 && /^[a-f0-9]+$/.test(key)) {
             slugsById[metadata.id] = metadata.fullPath
         }

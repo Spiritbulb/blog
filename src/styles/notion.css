@@ -8,7 +8,7 @@
    ============================================ */
 :root {
     --notion-max-width: 1200px;
-    --notion-header-height: 45vh;
+    --notion-header-height: 5vh;
 
     /* Colors - Super's palette (Light Mode) */
     --bg-color: #f7f6f3;
@@ -23,7 +23,7 @@
     --code-bg: #a0a0a0;
     --code-border: #e9e9e7;
     --code-text: #eb5757;
-    --inline-code-bg: #f1f1ef;
+    --inline-code-bg: #d6d6d6;
 
     /* Typography */
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial, sans-serif;
@@ -42,7 +42,7 @@
         --accent-peach: #3a2d1f;
         --border-color: #2f2f2f;
         --card-bg: #252525;
-        --callout-border: #4a3a2a;
+        --callout-border: #323232;
         --icon-bg: #2a2a2a;
         --code-bg: #2f2f2f;
         --code-border: #3a3a3a;
@@ -61,7 +61,7 @@
     --accent-peach: #3a2d1f;
     --border-color: #2f2f2f;
     --card-bg: #252525;
-    --callout-border: #4a3a2a;
+    --callout-border: #d6d6d6;
     --icon-bg: #2a2a2a;
     --code-bg: #2f2f2f;
     --code-border: #3a3a3a;
@@ -77,12 +77,12 @@
     --accent-peach: #fadec9;
     --border-color: #e3e2df;
     --card-bg: #ffffff;
-    --callout-border: #f3d8ba;
+    --callout-border: #ebebeb;
     --icon-bg: #ffffff;
-    --code-bg: #fce9c579;
+    --code-bg: #fafafa79;
     --code-border: #e9e9e7;
     --code-text: #eb5757;
-    --inline-code-bg: #f1f1ef;
+    --inline-code-bg: #d8d8d8;
 }
 
 /* ============================================
@@ -113,24 +113,14 @@
    PAGE TITLE STYLING (Large Header)
    ============================================ */
 .notion-title {
-    font-size: 4rem !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-    margin-bottom: 1.5rem !important;
-    margin-top: 3rem !important;
-    padding: 0 2rem;
-    max-width: var(--notion-max-width);
-    margin-left: auto;
-    margin-right: auto;
-    color: var(--text-primary);
-    transition: color 0.3s ease;
+    display: none !important;
 }
 
 /* ============================================
    CALLOUT STYLING (Alert Box)
    ============================================ */
 .notion-callout {
-    background: var(--accent-peach) !important;
+    background: #3e829977 !important;
     border: 1px solid var(--callout-border) !important;
     border-radius: 8px !important;
     padding: 1.5rem !important;
@@ -142,7 +132,7 @@
 }
 
 .notion-callout-text {
-    color: var(--text-primary) !important;
+    color: #ededed !important;
     font-size: 0.95rem !important;
     transition: color 0.3s ease;
 }

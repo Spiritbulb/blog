@@ -63,13 +63,22 @@ export function NotionPage({ recordMap, slugMap = {} }: NotionPageProps) {
                     Pdf,
                 }}
                 disableHeader={true}
-                // Map page IDs to slugs
+                // Map page IDs to their full hierarchical paths
                 mapPageUrl={(pageId) => {
+                    // Clean the page ID (remove dashes)
                     const cleanId = pageId.replace(/-/g, '')
-                    // Return slug if we have it, otherwise return ID
-                    const slug = slugMap[cleanId]
-                    console.log(`Mapping ${pageId} (${cleanId}) → ${slug || `/${cleanId}`}`)
-                    return slug
+
+                    // Get the full path from slugMap (includes parent/child structure)
+                    const fullPath = slugMap[cleanId]
+
+                    if (fullPath) {
+                        console.log(`Mapping ${pageId} → ${fullPath}`)
+                        return fullPath
+                    }
+
+                    // Fallback: return the ID if no slug mapping exists
+                    console.log(`No mapping for ${pageId}, using ID fallback`)
+                    return `/${cleanId}`
                 }}
             />
         </div>
