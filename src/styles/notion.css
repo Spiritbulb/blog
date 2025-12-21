@@ -113,7 +113,17 @@
    PAGE TITLE STYLING (Large Header)
    ============================================ */
 .notion-title {
-    display: none !important;
+    font-size: 4rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5rem !important;
+    margin-top: 3rem !important;
+    padding: 0 2rem;
+    max-width: var(--notion-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 /* ============================================
