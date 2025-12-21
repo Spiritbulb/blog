@@ -8,7 +8,7 @@
   --background: #f7f6f3;
   --foreground: #37352f;
   --text-secondary: #787774;
-  --accent-orange: #d9730d;
+  --accent-orange: #104e64;
   --accent-peach: #fadec9;
   --border-color: #e3e2df;
 
@@ -50,7 +50,7 @@
   --background: #f7f6f3;
   --foreground: #37352f;
   --text-secondary: #787774;
-  --accent-orange: #d9730d;
+  --accent-orange: #104e64;
   --accent-peach: #fadec9;
   --border-color: #e3e2df;
 }
@@ -127,12 +127,12 @@ body {
 }
 
 .nav-links a:hover {
-  color: var(--accent-orange);
+  color: #104e64;
 }
 
 /* Dark mode toggle button */
 .dark-mode-toggle {
-  color: var(--accent-orange);
+  color: #104e64;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;

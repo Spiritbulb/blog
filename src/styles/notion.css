@@ -159,7 +159,7 @@
    ============================================ */
 .notion-page-content {
     max-width: var(--notion-max-width);
-    margin: 0 auto;
+    margin: 0;
     padding: 0 2rem 4rem;
 }
 
@@ -349,16 +349,45 @@ code[class*="language-"] {
     display: none !important;
 }
 
-/* Gallery view styling */
+/* Gallery view styling - HORIZONTAL SCROLL */
 .notion-gallery-view {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: row;
     gap: 1.5rem;
     margin: 2rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+    padding-bottom: 1rem;
+    /* Space for scrollbar */
+}
+
+/* Optional: Hide scrollbar but keep functionality */
+.notion-gallery-view::-webkit-scrollbar {
+    height: 8px;
+}
+
+.notion-gallery-view::-webkit-scrollbar-track {
+    background: var(--inline-code-bg);
+    border-radius: 4px;
+}
+
+.notion-gallery-view::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.notion-gallery-view::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }
 
 .notion-gallery-grid {
     border-top: none !important;
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
 }
 
 .notion-collection-card {
@@ -367,6 +396,12 @@ code[class*="language-"] {
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    flex-shrink: 0;
+    /* Prevent cards from shrinking */
+    width: 280px;
+    /* Fixed width for consistency */
+    scroll-snap-align: start;
+    /* Snap to card when scrolling */
 }
 
 .notion-collection-card:hover {
@@ -456,8 +491,6 @@ code[class*="language-"] {
    ============================================ */
 .notion-property-multi_select-item,
 .notion-property-select-item {
-    background: var(--accent-peach) !important;
-    color: var(--accent-orange) !important;
     border: none !important;
     padding: 0.25rem 0.75rem !important;
     border-radius: 4px !important;
